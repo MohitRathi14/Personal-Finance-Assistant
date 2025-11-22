@@ -1,4 +1,4 @@
-import user from '../model/user.js';
+import User from '../model/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto'
@@ -10,12 +10,12 @@ export async function registerUser(req, res) {
     try {
         console.log(req.body);
         const { name, email, password } = req.body;
-        const existingUser = await user.findOne({ email });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).send({ success: false, message: 'Email already registered' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new user({
+        const newUser = new User({
             name: name,
             email: email,
             password: hashedPassword
@@ -67,7 +67,7 @@ export async function doLogin(req, res) {
         const { email, password } = req.body;
 
         // find user
-        const loginUser = await user.findOne({ email });
+        const loginUser = await User.findOne({ email });
 
         if (!loginUser) {
             return res.status(400).send({
@@ -130,20 +130,20 @@ export const verifyEmail = async (req, res) => {
     try {
         const { token } = req.query;
 
-        const user = await User.findOne({
+        const foundUser = await User.findOne({
             verificationToken: token,
             verificationExpires: { $gt: Date.now() }
         });
 
-        if (!user) {
+        if (!foundUser) {
             return res.status(400).json({ success: false, message: "Invalid or expired token" });
         }
 
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationExpires = undefined;
+        foundUser.isVerified = true;
+        foundUser.verificationToken = undefined;
+        foundUser.verificationExpires = undefined;
 
-        await user.save();
+        await foundUser.save();
 
         res.status(200).json({ success: true, message: "Email verified successfully!" });
     } catch (err) {
@@ -152,11 +152,12 @@ export const verifyEmail = async (req, res) => {
     }
 };
 
+
 // forgot password controller
 export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
-        const user = await user.findOne({ email });
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(404).send({ success: false, message: "User not found" });
@@ -199,24 +200,27 @@ export const resetPassword = async (req, res) => {
     try {
         const { token } = req.query;
         const { newPassword } = req.body;
-        const user = await user.findOne({
+        
+        const foundUser = await User.findOne({
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }
         });
-        if (!user) {
+        
+        if (!foundUser) {
             return res.status(400).send({ success: false, message: "Invalid or expired token" });
         }
+        
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
+        foundUser.password = hashedPassword;
+        foundUser.resetPasswordToken = undefined;
+        foundUser.resetPasswordExpires = undefined;
+        await foundUser.save();
+        
         res.status(200).send({ success: true, message: "Password has been reset successfully" });
     } catch (err) {
         console.log(err);
         res.status(500).send({ success: false, message: "Something went wrong" });
     }
 };
-
 
 

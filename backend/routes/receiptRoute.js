@@ -1,8 +1,10 @@
-import receipt from '../controllers/receiptController.js';
 import express from 'express';
+import * as receiptController from '../controller/receiptController.js';
+import { uploadReceipt } from '../middleware/uploadReceipt.js';
+import { authenticateUser } from '../middleware/auth.js';
+
 const router = express.Router();
 
-// Generate receipt route
-router.post('/extract-receipt',(req,res)=> receipt.extractReceiptData(req,res));
+router.post('/extract-receipt', authenticateUser, uploadReceipt.single('receipt'), receiptController.extractReceiptData);
 
 export default router;

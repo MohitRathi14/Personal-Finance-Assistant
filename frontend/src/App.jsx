@@ -8,14 +8,19 @@ import Layout from './components/Layout';
 // Auth Pages
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 
 // User Pages
 import Dashboard from './pages/Dashboard/Dashboard';
 import Transactions from './pages/Transactions/Transactions';
 import UploadReceipt from './pages/Receipts/UploadReceipt';
+import ReceiptHistory from './pages/Receipts/ReceiptHistory';
+import Profile from './pages/Profile/Profile';
 
-// Admin Pages (create these similarly)
-// import AdminDashboard from './pages/Admin/AdminDashboard';
+// Admin Pages
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import UserManagement from './pages/Admin/UserManagement';
 
 function App() {
   return (
@@ -26,8 +31,10 @@ function App() {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* Protected Routes */}
+            {/* Protected User Routes */}
             <Route
               element={
                 <ProtectedRoute>
@@ -38,12 +45,26 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/receipts" element={<UploadReceipt />} />
+              <Route path="/receipt-history" element={<ReceiptHistory />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
 
             {/* Admin Routes */}
-            {/* Add admin routes here with AdminRoute wrapper */}
+            <Route
+              element={
+                <AdminRoute>
+                  <Layout />
+                </AdminRoute>
+              }
+            >
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/transactions" element={<Dashboard />} />
+            </Route>
 
+            {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>

@@ -1,5 +1,5 @@
 import Tesseract from "tesseract.js";
-import pdfParse from "pdf-parse";
+import * as pdfParse from "pdf-parse";
 import fetch from "node-fetch";
 import ImportHistory from "../model/importHistory.js";
 
@@ -31,7 +31,8 @@ const processImage = async (url) => {
 const processPDF = async (url) => {
     const response = await fetch(url);
     const buffer = Buffer.from(await response.arrayBuffer());
-    const result = await pdfParse(buffer);
+    const parser = pdfParse.default ?? pdfParse;
+    const result = await parser(buffer);
     return result.text;
 };
 

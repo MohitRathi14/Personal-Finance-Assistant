@@ -15,23 +15,30 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['admin', 'user'],
         default: 'user'
-    }
-    ,
+    },
     password: {
         type: String,
         required: true
     },
     isVerified: {
-         type: Boolean,
-          default: false 
-        },
+        type: Boolean,
+        default: false 
+    },
     verificationToken: {
-             type: String 
-            },
+        type: String 
+    },
     verificationExpires: { 
         type: Date 
     },
-
+    resetPasswordToken: {
+        type: String
+    },
+    resetPasswordExpires: {
+        type: Date
+    },
+    lastLogin: {
+        type: Date
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -40,7 +47,6 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-
 });
 userSchema.plugin(timestampe);
 

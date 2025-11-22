@@ -1,31 +1,17 @@
-import paymentController from '../controller/paymentController.js';
 import express from 'express';
+import * as paymentController from '../controller/paymentController.js';
+import { authenticateUser } from '../middleware/auth.js';
+
 const router = express.Router();
 
-// Add transaction route
-router.post('/add-transaction', (req, res) => paymentController.createTransaction(req, res));
-// Get user transactions route
-router.get('/user-transactions', (req, res) => paymentController.getUserTransactions(req, res));
-// Get all transactions route
-router.get('/all-transactions', (req, res) => paymentController.getAllTransactions(req, res));
-// Delete transaction route
-router.delete('/delete-transaction/:id', (req, res) => paymentController.deleteTransaction(req, res));
+router.post('/add-transaction', authenticateUser, paymentController.createTransaction);
+router.get('/user-transactions', authenticateUser, paymentController.getUserTransactions);
+router.get('/all-transactions', authenticateUser, paymentController.getAllTransactions);
+router.delete('/delete-transaction/:id', authenticateUser, paymentController.deleteTransaction);
+router.post('/verify-transaction/:id', authenticateUser, paymentController.verifyTransaction);
+router.put('/edit-transaction/:id', authenticateUser, paymentController.editTransaction);
+router.post('/filter-by-date', authenticateUser, paymentController.filterTransactionsByDate);
+router.get('/category-summary', authenticateUser, paymentController.categoryBasedSummary);
+router.get('/graph-data', authenticateUser, paymentController.getGraphData);
 
-// vrerify transaction route
-router.post('/verify-transaction', (req, res) => paymentController.verifyTransaction(req, res));
-
-// edit transaction route
-router.put('/edit-transaction/:id', (req, res) => paymentController.editTransaction(req, res));
-
-//filter by date route
-router.post('/filter-by-date', (req, res) => paymentController.filterByDate(req, res));
-
-//category based summary route
-router.get('/category-summary', (req, res) => paymentController.categoryBasedSummary(req, res));
-
-//graph data route
-router.get('/graph-data', (req, res) => paymentController.graphData(req, res));
-
-
-// Export the router
 export default router;

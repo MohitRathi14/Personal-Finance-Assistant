@@ -1,4 +1,4 @@
-import Transaction from '../model/transaction';
+import Transaction from '../model/transaction.js';
 
 // create transaction controller (add income/expense)
 export const createTransaction = async (req, res) => {
