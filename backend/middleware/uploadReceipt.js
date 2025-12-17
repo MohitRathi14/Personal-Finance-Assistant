@@ -1,17 +1,22 @@
 import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../config/cloudinary.js";
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "finance_assistant_receipts",
-    format: async (req, file) => {
-      if (file.mimetype === "application/pdf") return "pdf";
-      return file.mimetype.split("/")[1];
+export const uploadReceipt = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10 MB
     },
-    public_id: (req, file) => Date.now() + "-" + file.originalname,
-  },
-});
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/jpg",
+            "application/pdf",
+        ];
 
-export const uploadReceipt = multer({ storage });
+        if (!allowedTypes.includes(file.mimetype)) {
+            return cb(new Error("Only images and PDFs are allowed"), false);
+        }
+
+        cb(null, true);
+    },
+});
