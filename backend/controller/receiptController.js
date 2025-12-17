@@ -1,33 +1,45 @@
 import Tesseract from "tesseract.js";
 import * as pdfParse from "pdf-parse";
 import fetch from "node-fetch";
+import streamifier from "streamifier";
+import cloudinary from "../config/cloudinary.js";
 import ImportHistory from "../model/importHistory.js";
 
-// Extractors
+// ------------------ Extractors ------------------
+
 const extractAmount = (text) => {
-    const regex = /(?:total|amount|amt|rs|₹)\s*[:\-]?\s*(\d+\.?\d*)/i;
+    const regex = /(?:total|amount|amt|rs|₹)\s*[:\-]?\s*([0-9,]+(?:\.\d+)?)/i;
     const match = text.match(regex);
-    return match ? parseFloat(match[1]) : null;
+    return match ? parseFloat(match[1].replace(/,/g, "")) : null;
 };
 
 const extractDate = (text) => {
-    const regex = /\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b/;
+    const regex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
     const match = text.match(regex);
-    return match ? new Date(match[1]) : null;
+    return match
+        ? new Date(
+            parseInt(match[1], 10),
+            parseInt(match[2], 10) - 1,
+            parseInt(match[3], 10)
+        )
+        : null;
 };
 
 const extractMerchant = (text) => {
-    const lines = text.split("\n").map(l => l.trim()).filter(l => l);
+    const lines = text
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
     return lines.length > 0 ? lines[0] : "Unknown Merchant";
 };
 
-// OCR helper for images
+// ------------------ OCR helpers ------------------
+
 const processImage = async (url) => {
     const result = await Tesseract.recognize(url, "eng");
     return result.data.text;
 };
 
-// PDF helper for remote PDF
 const processPDF = async (url) => {
     const response = await fetch(url);
     const buffer = Buffer.from(await response.arrayBuffer());
@@ -36,16 +48,42 @@ const processPDF = async (url) => {
     return result.text;
 };
 
-// Controller
+// ------------------ Controller ------------------
+
 export const extractReceiptData = async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).send({ success: false, message: "Receipt file is required" });
+            return res
+                .status(400)
+                .send({ success: false, message: "Receipt file is required" });
         }
 
-        const fileUrl = req.file.path;
+        // 1️⃣ Upload to Cloudinary (v2)
+        const uploadToCloudinary = () =>
+            new Promise((resolve, reject) => {
+                const isPdf = req.file.mimetype === "application/pdf";
+
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: "finance_assistant_receipts",
+                        resource_type: isPdf ? "raw" : "image",
+                        public_id: `${Date.now()}-${req.file.originalname}`,
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+
+                streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+            });
+
+        const cloudinaryResult = await uploadToCloudinary();
+
+        const fileUrl = cloudinaryResult.secure_url;
         const mime = req.file.mimetype;
 
+        // 2️⃣ OCR / PDF extraction
         let extractedText = "";
 
         if (mime === "application/pdf") {
@@ -54,11 +92,12 @@ export const extractReceiptData = async (req, res) => {
             extractedText = await processImage(fileUrl);
         }
 
+        // 3️⃣ Data extraction
         const amount = extractAmount(extractedText);
         const date = extractDate(extractedText);
         const merchant = extractMerchant(extractedText);
 
-        // save into database
+        // 4️⃣ Save to DB
         const history = await ImportHistory.create({
             userId: req.user.id,
             receiptUrl: fileUrl,
@@ -66,7 +105,8 @@ export const extractReceiptData = async (req, res) => {
             merchant,
             amount,
             date,
-            status: "processed"
+            status: "processed",
+            cloudinaryPublicId: cloudinaryResult.public_id,
         });
 
         return res.status(200).send({
@@ -74,15 +114,16 @@ export const extractReceiptData = async (req, res) => {
             message: "Receipt processed successfully",
             data: {
                 cloudinaryUrl: fileUrl,
-                rawText: extractedText,
                 merchant,
                 amount,
-                date
-            }
+                date,
+            },
         });
-
     } catch (err) {
-        console.log(err);
-        res.status(500).send({ success: false, message: "Error processing receipt" });
+        console.error(err);
+        res.status(500).send({
+            success: false,
+            message: "Error processing receipt",
+        });
     }
 };
