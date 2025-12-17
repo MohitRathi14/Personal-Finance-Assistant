@@ -127,3 +127,27 @@ export const extractReceiptData = async (req, res) => {
         });
     }
 };
+export const getImportHistory = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).send({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
+        const history = await ImportHistory.find({ userId })
+            .sort({ createdAt: -1 }); // Sort by the newest first
+        return res.status(200).send({
+            success: true,
+            message: "Import history fetched successfully",
+            receipts: history
+        });
+    }catch (err) {
+        console.error(err);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching import history",
+        });
+    }
+}
