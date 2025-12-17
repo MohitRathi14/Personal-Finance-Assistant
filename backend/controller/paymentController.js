@@ -46,7 +46,7 @@ export const createTransaction = async (req, res) => {
         res.status(500).send({ success: false, message: "Error creating transaction" });
     }
 };
-// verfy transaction controller
+// verify transaction controller
 export const verifyTransaction = async (req, res) => {
     try {
         const transactionId = req.params.id;
@@ -83,7 +83,7 @@ export const getUserTransactions = async (req, res) => {
         res.status(500).send({ success: false, message: "Error fetching transactions" });
     }
 };
-// get all transactions controller(list of income/expense)
+// get all transactions controllers (list of income/expense)
 export const getAllTransactions = async (req, res) => {
     try {
         const transactions = await Transaction.find({});
@@ -163,7 +163,7 @@ export const filterTransactionsByDate = async (req, res) => {
         res.status(500).send({ success: false, message: "Error filtering transactions" });
     }
 };
-// categorey based summary controller
+// category-based summary controller
 export const categoryBasedSummary = async (req, res) => {
     try {
         const summary = await Transaction.aggregate([
