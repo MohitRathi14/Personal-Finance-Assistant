@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 export const createAdminUser = async () => {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL||'asmit342sumit@gmail.com';
+    const adminEmail = process.env.ADMIN_EMAIL;
     const adinExist = await User.findOne({ email: adminEmail });
 
     if (!adinExist) {

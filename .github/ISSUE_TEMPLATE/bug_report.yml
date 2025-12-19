@@ -1,0 +1,90 @@
+name: "Bug report"
+description: Report a reproducible problem to help us improve the project
+title: "[bug] <short description>"
+labels: ["bug"]
+assignees: []
+body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-check
+      options:
+        - label: I have searched existing issues and discussions for duplicates
+          required: true
+        - label: I have read the README, CONTRIBUTING, and SECURITY policy
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: What happened, and what did you expect to happen?
+      placeholder: Clear and concise description of the problem
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Provide minimal steps. Link to a small repo or gist if possible.
+      placeholder: |
+        1. Run ...
+        2. Open ...
+        3. Click ...
+        4. See error ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and screenshots
+      description: Paste relevant logs or errors. Redact secrets. Attach screenshots if UI related.
+      render: shell
+  - type: input
+    id: repo-version
+    attributes:
+      label: Project version/commit
+      placeholder: vX.Y.Z or commit SHA
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      placeholder: "e.g., 18.x / 20.x"
+  - type: input
+    id: npm
+    attributes:
+      label: npm version
+      placeholder: "e.g., 10.x"
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: "Windows 11 / macOS 15 / Ubuntu 24.04 ..."
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser (if frontend/UI related)
+      options:
+        - N/A (backend only)
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment details
+      description: Any relevant package versions or environment info.
+      placeholder: |
+        react: 19.2.0
+        react-dom: 19.2.0
+        express: 5.1.0
+        mongoose: 8.19.3
+        vite: 7.2.2
+        node-fetch: 3.3.2
+        axios: 1.7.9
+        ...
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Anything else we should know?
