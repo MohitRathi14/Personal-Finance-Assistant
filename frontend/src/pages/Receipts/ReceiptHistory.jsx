@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Receipt, Eye, Calendar, DollarSign, Store } from 'lucide-react';
+import {receiptService} from '../../api/receiptService';
 
 const ReceiptHistory = () => {
   const [receipts, setReceipts] = useState([]);
@@ -10,39 +11,16 @@ const ReceiptHistory = () => {
     fetchReceiptHistory();
   }, []);
 
-  const fetchReceiptHistory = async () => {
-    try {
-      // Mock data for now - replace with actual API call
-      const mockReceipts = [
-        {
-          _id: '1',
-          merchant: 'Walmart',
-          amount: 125.50,
-          date: new Date('2024-11-15'),
-          receiptUrl: 'https://via.placeholder.com/400',
-          status: 'processed',
-          rawText: 'WALMART\nTotal: $125.50\nDate: 11/15/2024',
-          createdAt: new Date('2024-11-15'),
-        },
-        {
-          _id: '2',
-          merchant: 'Target',
-          amount: 89.99,
-          date: new Date('2024-11-14'),
-          receiptUrl: 'https://via.placeholder.com/400',
-          status: 'processed',
-          rawText: 'TARGET\nTotal: $89.99\nDate: 11/14/2024',
-          createdAt: new Date('2024-11-14'),
-        },
-      ];
-
-      setReceipts(mockReceipts);
-    } catch (error) {
-      console.error('Error fetching receipt history:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchReceiptHistory = async () => {
+  try {
+    const response = await receiptService.getReceiptHistory();
+    setReceipts(response.receipts);
+  } catch (error) {
+    console.error('Error fetching receipt history:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return (

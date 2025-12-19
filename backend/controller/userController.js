@@ -1,6 +1,6 @@
 import User from "../model/user.js";
 
-// get all users controller
+// get all user's controller
 export const getAllUsersController = async (req, res) => {
     try {
         const users = await User.find({});
@@ -18,7 +18,7 @@ export const getAllUsersController = async (req, res) => {
     }   
 };
 
-// get single user controller
+// get a single user controller
 export const getSingleUserController = async (req, res) => {
     try {
         const userId = req.params.id;

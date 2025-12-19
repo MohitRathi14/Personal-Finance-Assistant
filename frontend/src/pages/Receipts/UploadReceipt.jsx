@@ -43,7 +43,7 @@ const UploadReceipt = () => {
       await transactionService.createTransaction({
         amount: extractedData.amount,
         type: 'expense',
-        category: 'Other',
+        category: extractedData.category,
         date: extractedData.date || new Date(),
         description: `From receipt: ${extractedData.merchant}`,
       });

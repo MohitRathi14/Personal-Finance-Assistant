@@ -32,7 +32,12 @@ const extractMerchant = (text) => {
         .filter(Boolean);
     return lines.length > 0 ? lines[0] : "Unknown Merchant";
 };
-
+const extractCategories = (text) => {
+    const regex = /(?:categories|Categorie|Categories|categorie|category)\s*[:\-]?\s*(.*)/i;
+    const match = text.match(regex);
+    return match ?  match[1].split(",").map(c => c.trim()).join("")
+        : "";
+}
 // ------------------ OCR helpers ------------------
 
 const processImage = async (url) => {
@@ -84,7 +89,7 @@ export const extractReceiptData = async (req, res) => {
         const mime = req.file.mimetype;
 
         // 2️⃣ OCR / PDF extraction
-        let extractedText = "";
+        let extractedText;
 
         if (mime === "application/pdf") {
             extractedText = await processPDF(fileUrl);
@@ -96,15 +101,17 @@ export const extractReceiptData = async (req, res) => {
         const amount = extractAmount(extractedText);
         const date = extractDate(extractedText);
         const merchant = extractMerchant(extractedText);
+        const category = extractCategories(extractedText);
 
         // 4️⃣ Save to DB
-        const history = await ImportHistory.create({
+        await ImportHistory.create({
             userId: req.user.id,
             receiptUrl: fileUrl,
             rawText: extractedText,
             merchant,
             amount,
             date,
+            category,
             status: "processed",
             cloudinaryPublicId: cloudinaryResult.public_id,
         });
@@ -117,6 +124,7 @@ export const extractReceiptData = async (req, res) => {
                 merchant,
                 amount,
                 date,
+                category
             },
         });
     } catch (err) {

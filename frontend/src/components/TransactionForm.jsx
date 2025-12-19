@@ -2,11 +2,11 @@ import { useState } from 'react';
 
 const TransactionForm = ({ onSubmit, initialData = {}, loading = false }) => {
   const [formData, setFormData] = useState({
-    amount: initialData.amount || '',
-    type: initialData.type || 'expense',
-    category: initialData.category || '',
-    date: initialData.date || new Date().toISOString().split('T')[0],
-    description: initialData.description || '',
+    amount: initialData?.amount ?? '',
+    type: initialData?.type ?? 'expense',
+    category: initialData?.category ?? '',
+    date: initialData?.date ?? new Date().toISOString().split('T')[0],
+    description: initialData?.description ?? '',
   });
 
   const categories = {

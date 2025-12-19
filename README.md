@@ -37,8 +37,13 @@ Required environment variables (see `.env.example`):
 - `MONGODB_URI` — MongoDB connection string
 - `PORT` — backend port
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — Cloudinary credentials
-- `JWT_SECRET` — JWT signing secret
-- `EMAIL_USER`, `EMAIL_PASS` — SMTP credentials for nodemailer
+- `ADMIN_SECRET_KEY` — JWT signing secret for Admin
+- `USER_SECRET_KEY` — JWT signing secret for User
+- `EMAIL_USER`, `EMAIL_PASSWORD` — SMTP credentials for nodemailer
+- `FRONTEND_URL` — To set the frontend Url in backend
+- `ADMIN_EMAIL` — To set the email for the default admin
+- `ADMIN_PASSWORD` — To set the password for the default admin
+- `ADMIN_NAME` — To set the Name for the default admin
 
 ## Tests & CI
 This repo includes a basic GitHub Actions workflow for the backend. Adjust or expand CI as needed.
