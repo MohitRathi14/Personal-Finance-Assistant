@@ -5,7 +5,7 @@ import streamifier from "streamifier";
 import cloudinary from "../config/cloudinary.js";
 import ImportHistory from "../model/importHistory.js";
 
-// ------------------ Extractors ------------------
+
 
 const extractAmount = (text) => {
     const regex = /(?:total|amount|amt|rs|₹)\s*[:\-]?\s*([0-9,]+(?:\.\d+)?)/i;
@@ -38,7 +38,7 @@ const extractCategories = (text) => {
     return match ?  match[1].split(",").map(c => c.trim()).join("")
         : "";
 }
-// ------------------ OCR helpers ------------------
+
 
 const processImage = async (url) => {
     const result = await Tesseract.recognize(url, "eng");
@@ -53,7 +53,7 @@ const processPDF = async (url) => {
     return result.text;
 };
 
-// ------------------ Controller ------------------
+
 
 export const extractReceiptData = async (req, res) => {
     try {
